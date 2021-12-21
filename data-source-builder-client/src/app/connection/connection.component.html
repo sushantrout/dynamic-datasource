@@ -4,7 +4,7 @@
       <div class="form-group">
         <label for="exampleInputPassword1">URL</label>
         <input
-          type="password"
+          type="text"
           class="form-control"
           id="exampleInputPassword1"
           [(ngModel)]='model.url'
@@ -14,7 +14,7 @@
       <div class="form-group">
         <label for="exampleInputPassword1">Username</label>
         <input
-          type="password"
+          type="text"
           class="form-control"
           id="exampleInputPassword1"
           placeholder="USERNAME"
@@ -24,7 +24,7 @@
       <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
         <input
-          type="password"
+          type="text"
           class="form-control"
           id="exampleInputPassword1"
           [(ngModel)]='model.password'
@@ -34,16 +34,20 @@
       <div class="form-group">
         <label for="exampleInputPassword1">Type</label>
         <input
-          type="password"
+          type="text"
           class="form-control"
           id="exampleInputPassword1"
           [(ngModel)]='model.type'
           placeholder="TYPE"
         />
       </div>
-      {{model | json}}
-      <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;">Test Connection!</button>
-      <button type="reset" class="btn btn-primary" style="float: right;">Reset</button>
+      <div>
+        <button *ngFor='let table of tableList' class="btn btn-info"
+        style="margin: 10px;"
+        (click)="getTableDetails(table)">{{table.table_name}}</button>
+      </div>
+      <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;" (click)="testConnection()">Test Connection!</button>
+      <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
   </div>
   <div class="col-md-4"></div>
 </div>

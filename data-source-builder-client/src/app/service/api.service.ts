@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,6 @@ export class ApiService {
   }
 
   post(url:string, model : any){
-    return this.http.post(url, model);
+    return this.http.post(`${environment.apiUrl+url}`, model);
   }
 }
