@@ -6,22 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.transaction.Transactional;
 
+import com.bip.dao.ConnectionDao;
+import com.bip.entity.Connection;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import com.bip.model.ConnectionModel;
@@ -31,16 +24,18 @@ import com.bip.model.ConnectionModel;
 @Slf4j
 public class ConnectionController {
 
+	@Autowired
+	private ConnectionDao connectionDao;
     Logger logger = LoggerFactory.getLogger(ConnectionController.class);
 
-    @GetMapping
-    public ConnectionModel empty() {
-        return new ConnectionModel();
-    }
+	@GetMapping
+	public List<Connection> getAllConnectionDetails() {
+		return connectionDao.findAll();
+	}
 
     /* JDBC Template Implementation Start */
 
-	@PostMapping
+	@PutMapping
 	public List<Map<String, Object>> testConnection(@RequestBody ConnectionModel model) throws SQLException {
 		String url = model.getUrl();
 		String username = model.getUsername();
@@ -49,6 +44,10 @@ public class ConnectionController {
 		String driveClassName = driverClassNameAndQUery.get(0);
 
 		DataSource build = getDataSource(url, username, password, driveClassName);
+		boolean isConnected = build.getConnection().isValid(100);
+		if(isConnected) {
+			connectionDao.save(model._toConvertConnectionEntity());
+		}
 		List<Map<String, Object>> queryForList = executeQuery(driverClassNameAndQUery, build);
 		return queryForList;
 	}
