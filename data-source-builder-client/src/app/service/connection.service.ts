@@ -9,7 +9,13 @@ import { ConnectionModel } from "../model/connection.model";
 export class ConnectionService {
   baseURL = "connection";
   constructor(private api: ApiService) {}
+
   getConnection(model : ConnectionModel){
     return this.api.post(this.baseURL, model);
   }
+
+  getTableInfo(tablename : string, model : ConnectionModel) {
+    return this.api.post(`${this.baseURL}/${tablename}`, model);
+  }
+
 }

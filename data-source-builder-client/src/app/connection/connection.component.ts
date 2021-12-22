@@ -13,18 +13,26 @@ export class ConnectionComponent implements OnInit {
   constructor(private connectionService : ConnectionService) { }
 
   tableList : any[] = [];
+  columnList : any[] = [];
   ngOnInit(): void {
     this.model = new ConnectionModel('', '', '', '');
+    this.tableList = [];
+    this.columnList = [];
   }
 
   testConnection(){
     this.connectionService.getConnection(this.model).subscribe((res: any) => {
       this.tableList = res;
+      this.columnList = [];
     });
   }
+
   getTableDetails(tablename: string){
-    console.log(tablename);
+    this.connectionService.getTableInfo(tablename, this.model).subscribe((res : any) => {
+      this.columnList = res;
+    })
   }
+
   reset(){
     this.model = new ConnectionModel('', '', '', '');
   }
