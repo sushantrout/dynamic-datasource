@@ -1,6 +1,6 @@
 <div class="row">
   
-  <div class="col-md-4">
+  <div class="col-md-4" style="margin-top: 10px;">
       <div class="form-group">
         <label for="exampleInputPassword1">URL</label>
         <input
@@ -50,8 +50,25 @@
       <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
   </div>
   <div class="col-md-4">
-    <button *ngFor='let column of columnList' class="btn btn-info"
+    <!-- <div *ngFor='let column of columnList'>
+      <button class="btn btn-info btn-sm"
         style="margin: 10px;">{{column.column_name}}</button>
+      <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" unchecked></div>
+    </div> -->
+    <button class="btn btn-primary" *ngIf="table_name" style="margin-top: 10px; margin-bottom: 10px">{{table_name}}</button>
+    <p *ngFor='let column of columnList'>
+      <input  type="checkbox" [value]="column.column_name"
+            (click)="getColumnName($event)" > {{column.column_name}}
+    </p>
   </div>
-  <div class="col-md-4"></div>
+  <div class="col-md-4" *ngIf="column_name" style="margin-top: 10px;">
+    <input
+          type="text"
+          class="form-control"
+          id="column_name"
+          [(ngModel)]='column_name'
+          placeholder="Column name"
+        />
+    <button class="btn btn-primary btn-sm" (click)="changeColumnName()" style="margin-top: 10px;">change</button>
+  </div>
 </div>

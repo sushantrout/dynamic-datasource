@@ -101,6 +101,26 @@ public class ConnectionController {
         return queryForList;
     }
 
+	@PostMapping("/{oldcolumnname}/{columnname}/{tablename}")
+	private void updateColumnName(@PathVariable("oldcolumnname") String oldcolumnname, @PathVariable("columnname") String columnname,
+								  @PathVariable("tablename") String tablename,
+								  @RequestBody ConnectionModel model) throws SQLException {
+		logger.info("table info called");
+		String sqlQuery = "ALTER TABLE "+tablename+" RENAME COLUMN "+oldcolumnname+" TO "+columnname+"";
+
+		String url = model.getUrl();
+		String username = model.getUsername();
+		String password = model.getPassword();
+		List<String> driverClassNameAndQUery = driverClassNameAndQuery(model.getType());
+		String driveClassName = driverClassNameAndQUery.get(0);
+
+		DataSource build = getDataSource(url, username, password, driveClassName);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(build);
+		jdbcTemplate.execute(sqlQuery);
+
+		build.getConnection().close();
+	}
+
     /*JDBC Template Implementation end*/
 
     /* Hibernate Template Implementation start */

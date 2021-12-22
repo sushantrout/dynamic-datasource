@@ -18,4 +18,8 @@ export class ConnectionService {
     return this.api.post(`${this.baseURL}/${tablename}`, model);
   }
 
+  updateColumnName(oldcolumnname : string, columnname : string, tablename : string, model : ConnectionModel) {
+    return this.api.post(`${this.baseURL}/${oldcolumnname}/${columnname}/${tablename}`, model);
+  }
+
 }
