@@ -33,6 +33,11 @@ public class ConnectionController {
 		return connectionDao.findAll();
 	}
 
+	@GetMapping("/{dataSourceName}")
+	public Connection getConnectionDetailByName(@PathVariable("dataSourceName") String dataSourceName) {
+		return connectionDao.findByDataSourceName(dataSourceName);
+	}
+
     /* JDBC Template Implementation Start */
 
 	@PutMapping

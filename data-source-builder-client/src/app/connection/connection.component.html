@@ -1,53 +1,70 @@
+<select id="databases" class="selectbtn" (change)="getDataSourceTables($event)">
+  <option class="btn btn-info">Select</option>
+  <option *ngFor='let datasource of dataSources' class="btn btn-info"
+  style="margin: 10px;"
+  value="{{datasource.dataSourceName}}">{{datasource.dataSourceName}}</option>
+</select>
+
 <div class="row">
   
   <div class="col-md-4" style="margin-top: 10px;">
+    <div class="form-group">
+      <label for="dataSourceName">Datasource Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="dataSourceName"
+        [(ngModel)]='model.dataSourceName'
+        placeholder="DATASOURCE NAME"
+      />
+    </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">URL</label>
+        <label for="url">URL</label>
         <input
           type="text"
           class="form-control"
-          id="exampleInputPassword1"
+          id="url"
           [(ngModel)]='model.url'
           placeholder="URL"
         />
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">Username</label>
+        <label for="username">Username</label>
         <input
           type="text"
           class="form-control"
-          id="exampleInputPassword1"
+          id="username"
           placeholder="USERNAME"
           [(ngModel)]='model.username'
         />
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
+        <label for="password">Password</label>
         <input
           type="text"
           class="form-control"
-          id="exampleInputPassword1"
+          id="password"
           [(ngModel)]='model.password'
           placeholder="PASSWORD"
         />
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">Type</label>
+        <label for="type">Type</label>
         <input
           type="text"
           class="form-control"
-          id="exampleInputPassword1"
+          id="type"
           [(ngModel)]='model.type'
           placeholder="TYPE"
         />
       </div>
+      <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;" (click)="testConnection()">Test Connection!</button>
+      <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
       <div>
         <button *ngFor='let table of tableList' class="btn btn-info"
         style="margin: 10px;"
         (click)="getTableDetails(table.table_name)">{{table.table_name}}</button>
       </div>
-      <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;" (click)="testConnection()">Test Connection!</button>
-      <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
   </div>
   <div class="col-md-4">
     <!-- <div *ngFor='let column of columnList'>

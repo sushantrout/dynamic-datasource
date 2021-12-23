@@ -11,7 +11,7 @@ export class ConnectionService {
   constructor(private api: ApiService) {}
 
   getConnection(model : ConnectionModel){
-    return this.api.post(this.baseURL, model);
+    return this.api.put(this.baseURL, model);
   }
 
   getTableInfo(tablename : string, model : ConnectionModel) {
@@ -20,6 +20,13 @@ export class ConnectionService {
 
   updateColumnName(oldcolumnname : string, columnname : string, tablename : string, model : ConnectionModel) {
     return this.api.post(`${this.baseURL}/${oldcolumnname}/${columnname}/${tablename}`, model);
+  }
+  getAllConnectionDetails(){
+    return this.api.get(this.baseURL);
+  }
+  getConnectionByDataSourceName(dataSourceName: string){
+    console.log('data:',dataSourceName)
+    return this.api.get(`${this.baseURL}/${dataSourceName}`);
   }
 
 }

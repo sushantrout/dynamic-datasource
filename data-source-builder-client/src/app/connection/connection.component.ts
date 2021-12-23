@@ -10,9 +10,10 @@ import { ConnectionService } from '../service/connection.service';
 })
 export class ConnectionComponent implements OnInit {
 
-  model : ConnectionModel = new ConnectionModel('', '', '', '');
+  model : ConnectionModel = new ConnectionModel('', '', '', '', '');
   constructor(private connectionService : ConnectionService, private alertifyService : AlertifyService) { }
 
+  dataSources: ConnectionModel[] = [];
   tableList : any[] = [];
   columnList : any[] = [];
   column_name : string = '';
@@ -20,16 +21,25 @@ export class ConnectionComponent implements OnInit {
   old_column_name : string = '';
 
   ngOnInit(): void {
-    this.model = new ConnectionModel('', '', '', '');
+    this.model = new ConnectionModel('', '', '', '', '');
     this.tableList = [];
     this.columnList = [];
     this.old_column_name = '';
+    this.connectionService.getAllConnectionDetails().subscribe((res: any) => {
+      this.dataSources = res;
+    });
   }
 
   testConnection(){
     this.connectionService.getConnection(this.model).subscribe((res: any) => {
       this.tableList = res;
       this.columnList = [];
+    });
+  }
+
+  getDataSourceTables(event: any) {
+    this.connectionService.getConnectionByDataSourceName(event.target.value).subscribe((res: any) => {
+      this.model = res;
     });
   }
 
@@ -41,7 +51,7 @@ export class ConnectionComponent implements OnInit {
   }
 
   reset(){
-    this.model = new ConnectionModel('', '', '', '');
+    this.model = new ConnectionModel('', '', '', '', '');
   }
 
   getColumnName(event : Event) : any {

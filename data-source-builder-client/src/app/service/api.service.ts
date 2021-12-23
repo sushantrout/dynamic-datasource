@@ -12,7 +12,11 @@ export class ApiService {
   constructor(private http : HttpClient) { }
 
   get(url : string){
+    return this.http.get(`${environment.apiUrl+url}`);
+  }
 
+  put(url:string, model : any){
+    return this.http.put(`${environment.apiUrl+url}`, model);
   }
 
   post(url:string, model : any){
