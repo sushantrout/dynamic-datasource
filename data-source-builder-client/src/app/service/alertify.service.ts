@@ -19,4 +19,10 @@ export class AlertifyService {
   warning(message: string) {
     alertyfy.warning(message);
   }
+
+  alert(message: string) {
+    alertyfy.alert(message, function() {
+      alertyfy.success('Ok');
+    })
+  }
 }

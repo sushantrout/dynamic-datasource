@@ -1,8 +1,10 @@
 .selectbtn {
-    background-color: #3719dd;
+    background-color: #857eac;
     color: white;
     padding: 16px;
     font-size: 16px;
     border: none;
     cursor: pointer;
+    margin-left: 5px;
+    margin-top: 10px;
   }

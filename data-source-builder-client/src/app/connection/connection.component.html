@@ -1,13 +1,16 @@
-<select id="databases" class="selectbtn" (change)="getDataSourceTables($event)">
-  <option class="btn btn-info">Select</option>
-  <option *ngFor='let datasource of dataSources' class="btn btn-info"
-  style="margin: 10px;"
-  value="{{datasource.dataSourceName}}">{{datasource.dataSourceName}}</option>
-</select>
-
 <div class="row">
-  
-  <div class="col-md-4" style="margin-top: 10px;">
+  <div class="col-md-3">
+    <select id="databases" class="selectbtn" (change)="getDataSourceTables($event)" style='width:100%;'>
+      <option class="btn btn-info">--Please Select--</option>
+      <option *ngFor='let datasource of dataSources' class="btn btn-info"
+      style="margin: 10px;"
+      value="{{datasource.dataSourceName}}">{{datasource.dataSourceName}}</option>
+    </select>
+  </div>
+</div>
+
+<div class="row" style="padding-left: 5px;">
+  <div class="col-md-3" style="margin-top: 10px;">
     <div class="form-group">
       <label for="dataSourceName">Datasource Name</label>
       <input
@@ -60,32 +63,45 @@
       </div>
       <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;" (click)="testConnection()">Test Connection!</button>
       <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
-      <div>
-        <button *ngFor='let table of tableList' class="btn btn-info"
-        style="margin: 10px;"
-        (click)="getTableDetails(table.table_name)">{{table.table_name}}</button>
-      </div>
   </div>
-  <div class="col-md-4">
-    <!-- <div *ngFor='let column of columnList'>
-      <button class="btn btn-info btn-sm"
-        style="margin: 10px;">{{column.column_name}}</button>
-      <div class="custom-control custom-checkbox"><input type="checkbox" class="custom-control-input" unchecked></div>
-    </div> -->
-    <button class="btn btn-primary" *ngIf="table_name" style="margin-top: 10px; margin-bottom: 10px">{{table_name}}</button>
+  <div class="col-md-3">
+    <div class="card" style="margin-top: 80px;">
+      <button *ngFor='let table of tableList' class="btn btn-info"
+      style="margin: 10px;"
+      (click)="getTableDetails(table.table_name)">{{table.table_name}}</button>
+    </div>
+  </div>
+  <div class="col-md-3">
     <p *ngFor='let column of columnList'>
-      <input  type="checkbox" [value]="column.column_name"
-            (click)="getColumnName($event)" > {{column.column_name}}
+      <input type="checkbox" [value]="column.column_name"
+            (change)="selectColumn($event)"> {{column.column_name}}
+      <input name="radio" type="radio" (click)="selectColumnToChangeHeader($event)" [value]="column.column_name"> Want to change the header name?
     </p>
+    
+    <input type="text" *ngIf="hasRequestTochangeHeader"
+            class="form-control"
+            id="url"
+            [(ngModel)]='selectedColumnForHeader'
+            placeholder="change column header"
+          />
+    <button class="btn btn-primary" *ngIf="table_name" (click)="getColumnValue()" style="margin-top: 10px; margin-bottom: 10px">Load Data</button> &nbsp;
+    <button class="btn btn-primary" *ngIf="hasRequestTochangeHeader" (click)="changeColumnHeader()">Change Header</button>
   </div>
-  <div class="col-md-4" *ngIf="column_name" style="margin-top: 10px;">
-    <input
-          type="text"
-          class="form-control"
-          id="column_name"
-          [(ngModel)]='column_name'
-          placeholder="Column name"
-        />
-    <button class="btn btn-primary btn-sm" (click)="changeColumnName()" style="margin-top: 10px;">change</button>
+  <div class="col-md-3" *ngIf="table_name" style="margin-top: 10px;">
+    <button class="btn btn-primary" *ngIf="table_name" style="margin-top: 10px; margin-bottom: 10px">{{table_name}}</button>
+    <table class="table table-sm table-hover table-dark table-bordered">
+        <tr>
+          <th *ngFor='let column of selectedColumnList'>
+            {{column}}
+          </th>
+        </tr>
+      
+        <tr *ngFor='let columnvalue of columnValueList'>
+          <td *ngFor='let propertyName of selectedColumnList'>
+            {{columnvalue[propertyName]}}
+          </td>
+      </tr>
+    </table>
+    <button class="btn btn-primary" *ngIf="isHeaderChanged" (click)="getTableData()">Refresh table</button>
   </div>
 </div>

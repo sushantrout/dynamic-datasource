@@ -4,11 +4,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
 import com.bip.dao.ConnectionDao;
 import com.bip.entity.Connection;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +45,9 @@ public class ConnectionController {
 
 	@PutMapping
 	public List<Map<String, Object>> testConnection(@RequestBody ConnectionModel model) throws SQLException {
-		String url = model.getUrl();
-		String username = model.getUsername();
-		String password = model.getPassword();
-		List<String> driverClassNameAndQUery = driverClassNameAndQuery(model.getType());
-		String driveClassName = driverClassNameAndQUery.get(0);
+		DataSource build = (DataSource) this.processModelData(model).get(0);
+		List<String> driverClassNameAndQUery = (List<String>) this.processModelData(model).get(1);
 
-		DataSource build = getDataSource(url, username, password, driveClassName);
 		boolean isConnected = build.getConnection().isValid(100);
 		if(isConnected) {
 			connectionDao.save(model._toConvertConnectionEntity());
@@ -78,7 +77,6 @@ public class ConnectionController {
 
 	private List<String> driverClassNameAndQuery(String type) {
 		String postgresQuery = "SELECT table_name FROM information_schema.tables";
-		//String critarea = "";
 		String critarea = " WHERE table_schema = 'public';";
 
 		String drivename = "org.postgresql.Driver";
@@ -93,37 +91,62 @@ public class ConnectionController {
         logger.info("table info called");
 		String sqlQuery = "SELECT column_name FROM information_schema.columns WHERE table_name = '"+name+"'";
 
-        String url = model.getUrl();
-        String username = model.getUsername();
-        String password = model.getPassword();
-        List<String> driverClassNameAndQUery = driverClassNameAndQuery(model.getType());
-        String driveClassName = driverClassNameAndQUery.get(0);
-
-        DataSource build = getDataSource(url, username, password, driveClassName);
+        DataSource build = (DataSource) this.processModelData(model).get(0);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(build);
 		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlQuery);
 		build.getConnection().close();
         return queryForList;
     }
 
+	@PostMapping("/{columnname}/{tablename}")
+	private List<Map<String, Object>> getColumnInformation(@PathVariable("columnname") String columnname,
+														   @PathVariable("tablename") String tablename,
+														   @RequestBody ConnectionModel model) throws SQLException {
+		columnname = columnname.replaceFirst(",", "");
+		log.info(columnname);
+		String sqlQuery = "SELECT "+columnname+" FROM "+tablename;
+
+		DataSource build = (DataSource) this.processModelData(model).get(0);
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(build);
+		final List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlQuery);
+		build.getConnection().close();
+		return queryForList;
+	}
+
 	@PostMapping("/{oldcolumnname}/{columnname}/{tablename}")
 	private void updateColumnName(@PathVariable("oldcolumnname") String oldcolumnname, @PathVariable("columnname") String columnname,
 								  @PathVariable("tablename") String tablename,
 								  @RequestBody ConnectionModel model) throws SQLException {
-		logger.info("table info called");
+		Pattern pattern = Pattern.compile("\\s");
+		Matcher matcher = pattern.matcher(columnname);
+		boolean isColumnNameContainsSpace = matcher.find();
+		if(isColumnNameContainsSpace) {
+			String sqlQuery = "ALTER TABLE "+tablename+" RENAME COLUMN "+oldcolumnname+" TO "+columnname+"";
+		}
 		String sqlQuery = "ALTER TABLE "+tablename+" RENAME COLUMN "+oldcolumnname+" TO "+columnname+"";
 
+		DataSource build = (DataSource) this.processModelData(model).get(0);
+
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(build);
+		jdbcTemplate.execute(sqlQuery);
+
+		this.getColumnInformation(columnname, tablename, model);
+		build.getConnection().close();
+	}
+
+	private ArrayList<Object> processModelData(ConnectionModel model) {
 		String url = model.getUrl();
 		String username = model.getUsername();
 		String password = model.getPassword();
 		List<String> driverClassNameAndQUery = driverClassNameAndQuery(model.getType());
 		String driveClassName = driverClassNameAndQUery.get(0);
-
 		DataSource build = getDataSource(url, username, password, driveClassName);
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(build);
-		jdbcTemplate.execute(sqlQuery);
 
-		build.getConnection().close();
+		ArrayList<Object> object = new ArrayList<>();
+		object.add(build);
+		object.add(driverClassNameAndQUery);
+
+		return object;
 	}
 
     /*JDBC Template Implementation end*/
