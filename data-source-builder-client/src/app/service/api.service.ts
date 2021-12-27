@@ -11,15 +11,15 @@ export class ApiService {
 
   constructor(private http : HttpClient) { }
 
-  get(url : string){
+  get(url : string) : Observable<any> {
     return this.http.get(`${environment.apiUrl+url}`);
   }
 
-  put(url:string, model : any){
+  put(url:string, model : any) {
     return this.http.put(`${environment.apiUrl+url}`, model);
   }
 
-  post(url:string, model : any){
+  post(url:string, model : any) : Observable<any> {
     return this.http.post(`${environment.apiUrl+url}`, model);
   }
 

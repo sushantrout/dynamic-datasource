@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ColumnMapper } from '../model/columnmapper.model';
 import { ConnectionModel } from '../model/connection.model';
 import { AlertifyService } from '../service/alertify.service';
+import { ColumnMpperService } from '../service/column-mpper.service';
 import { ConnectionService } from '../service/connection.service';
 
 @Component({
@@ -11,13 +13,15 @@ import { ConnectionService } from '../service/connection.service';
 export class ConnectionComponent implements OnInit {
 
   model : ConnectionModel = new ConnectionModel('', '', '', '', '');
-  constructor(private connectionService : ConnectionService, private alertifyService : AlertifyService) { }
+  columnMapper : ColumnMapper = new ColumnMapper('', '', '', '');
+  constructor(private connectionService : ConnectionService, private columnMapperService : ColumnMpperService, private alertifyService : AlertifyService) { }
 
   dataSources: ConnectionModel[] = [];
   tableList : any[] = [];
   columnList : any[] = [];
   columnValueList : any[] = [];
-  selectedColumnList: any[] = [];
+  selectedColumnList : any[] = [];
+  tableHtmlColumnMapper : any [] = [];
 
   table_name : string = '';
   selectedColumnForHeader : string = '';
@@ -27,13 +31,24 @@ export class ConnectionComponent implements OnInit {
   isRefreshedData : boolean = false;
   hasRequestTochangeHeader : boolean = false;
 
+  
   ngOnInit(): void {
     this.model = new ConnectionModel('', '', '', '', '');
+    this.columnMapper = new ColumnMapper('', '', '', '');
     this.tableList = [];
     this.columnList = [];
     this.columnValueList = [];
     this.selectedColumnList = [];
     this.getAllDataSources();
+    // let item1 = {
+    //   'empid':'Employee Id',
+    // }
+    // let item2={
+    //   'first_name': 'First Name'
+    // }
+    // this.tableHtmlColumnMapper.push(item1);
+    // this.tableHtmlColumnMapper.push(item2);
+    
   }
 
   changeColumnHeader() {
@@ -48,6 +63,13 @@ export class ConnectionComponent implements OnInit {
    })
   }
 
+  getHtmlHeaders() {
+    this.columnMapperService.getColumnMapperByConnectionAndTable(this.model.dataSourceName, this.table_name).subscribe((res : any) => {
+      this.tableHtmlColumnMapper = res;
+      console.log('Column Mapper: ' +res);
+    })
+  }
+
   getAllDataSources() {
     this.connectionService.getAllConnectionDetails().subscribe((res: any) => {
       this.dataSources = res;
@@ -58,15 +80,19 @@ export class ConnectionComponent implements OnInit {
     this.connectionService.getConnectionByDataSourceName(event.target.value).subscribe((res: any) => {
       this.model = res;
     });
+    
   }
 
   getTableDetails(tablename: string)  {
     this.selectedColumnList = [];
     this.columnValueList = [];
+    this.selectedColumnForHeader = '';
+    this.hasRequestTochangeHeader = false; 
     this.table_name = tablename;
     this.connectionService.getTableInfo(tablename, this.model).subscribe((res : any) => {
       this.columnList = res;
     })
+    this.saveColumnMapper();
   }
 
   getColumnValue() : any {
@@ -81,10 +107,15 @@ export class ConnectionComponent implements OnInit {
 
   getTableData() {
     this.isRefreshedData = true;
-    // this.connectionService.getAllColumnsWithValues(this.table_name, this.model).subscribe((res : any) => {
-    //   console.log('result after refresh: ' +res);
-    // })
-    //this.getTableDetails(this.table_name);
+  }
+
+  getColumnHeader(column:any){
+    for(let item of this.tableHtmlColumnMapper){
+      if(item[column]){
+        return item[column];
+      }
+    }
+    return column;
   }
 
   reset() {
@@ -103,12 +134,27 @@ export class ConnectionComponent implements OnInit {
     this.hasRequestTochangeHeader = true;
   }
 
+  saveColumnMapper() {
+    if(this.columnList) {
+      let columnMap : Map<string, string>  = new Map<string, string> ();
+      console.log('Column List: ' +this.columnList);
+      for(let col of this.columnList) {
+        columnMap.set(col.column_name, col.column_name);
+      }
+      this.columnMapper = new ColumnMapper('', this.model.dataSourceName, this.table_name, columnMap);
+      this.columnMapperService.createColumnMapper(this.columnMapper).subscribe((res : any) => {
+        console.log('Column Mapper  saved: ' +res);
+      })
+    }
+  }
+
   testConnection() {
     this.connectionService.getConnection(this.model).subscribe((res: any) => {
       this.tableList = res;
       this.columnList = [];
     });
     this.getAllDataSources();
+   
   }
 
 }

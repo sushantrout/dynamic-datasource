@@ -68,7 +68,7 @@
     <div class="card" style="margin-top: 80px;">
       <button *ngFor='let table of tableList' class="btn btn-info"
       style="margin: 10px;"
-      (click)="getTableDetails(table.table_name)">{{table.table_name}}</button>
+      (click)="getTableDetails(table.table_name)" (change)="getTableDetails(table.table_name)">{{table.table_name}}</button>
     </div>
   </div>
   <div class="col-md-3">
@@ -92,7 +92,7 @@
     <table class="table table-sm table-hover table-dark table-bordered">
         <tr>
           <th *ngFor='let column of selectedColumnList'>
-            {{column}}
+            {{getColumnHeader(column)}}
           </th>
         </tr>
       
