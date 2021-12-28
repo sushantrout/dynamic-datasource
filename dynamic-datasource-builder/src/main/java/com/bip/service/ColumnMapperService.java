@@ -13,6 +13,10 @@ public class ColumnMapperService {
     @Autowired
     private ColumnMapperDao columnMapperDao;
     public ColumMapper save(ColumMapper mapper) {
+        List<ColumMapper> byConnectionAndTableName = findByConnectionAndTableName(mapper.getConnection(), mapper.getTablename());
+        if(!byConnectionAndTableName.isEmpty()){
+            mapper.setId(byConnectionAndTableName.get(0).getId());
+        }
         columnMapperDao.save(mapper);
         return mapper;
     }
@@ -22,6 +26,6 @@ public class ColumnMapperService {
     }
 
     public List<ColumMapper> findByConnectionAndTableName(Connection connectionid, String tablename) {
-        return columnMapperDao.findByConnectionAndTableName(connectionid, tablename);
+        return columnMapperDao.findByConnectionAndTablename(connectionid, tablename);
     }
 }

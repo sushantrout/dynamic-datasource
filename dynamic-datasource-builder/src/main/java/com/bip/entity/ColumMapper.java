@@ -20,8 +20,8 @@ public class ColumMapper {
     private Connection connection;
 
     @Column
-    private String tableName;
+    private String tablename;
 
     @Column
-    private Map<String, String> mapperDetails;
+    private String mapperdetails;
 }

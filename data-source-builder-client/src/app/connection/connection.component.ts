@@ -11,62 +11,59 @@ import { ConnectionService } from '../service/connection.service';
   styleUrls: ['./connection.component.css']
 })
 export class ConnectionComponent implements OnInit {
-
-  model : ConnectionModel = new ConnectionModel('', '', '', '', '');
-  columnMapper : ColumnMapper = new ColumnMapper('', '', '', '');
-  constructor(private connectionService : ConnectionService, private columnMapperService : ColumnMpperService, private alertifyService : AlertifyService) { }
+  
+  constructor(private connectionService: ConnectionService, private columnMapperService: ColumnMpperService, private alertifyService: AlertifyService) { }
+ 
+  model: ConnectionModel = new ConnectionModel('', '', '', '', '');
+  columnMapper: ColumnMapper = new ColumnMapper('', new ConnectionModel(), '', '');
 
   dataSources: ConnectionModel[] = [];
-  tableList : any[] = [];
-  columnList : any[] = [];
-  columnValueList : any[] = [];
-  selectedColumnList : any[] = [];
-  tableHtmlColumnMapper : any [] = [];
+  tableList: any[] = [];
+  columnList: any[] = [];
+  columnValueList: any[] = [];
+  selectedColumnList: any[] = [];
+  tableHtmlColumnMapper: ColumnMapper[] = [];
 
-  table_name : string = '';
-  selectedColumnForHeader : string = '';
-  old_column_name : string = '';
+  table_name: string = '';
+  selectedColumnForHeader: string = '';
+  old_column_name: string = '';
 
-  isHeaderChanged : boolean = false;
-  isRefreshedData : boolean = false;
-  hasRequestTochangeHeader : boolean = false;
+  isHeaderChanged: boolean = false;
+  isRefreshedData: boolean = false;
+  hasRequestTochangeHeader: boolean = false;
 
-  
+
   ngOnInit(): void {
     this.model = new ConnectionModel('', '', '', '', '');
-    this.columnMapper = new ColumnMapper('', '', '', '');
+    this.columnMapper = new ColumnMapper('', new ConnectionModel(), '', '');
     this.tableList = [];
     this.columnList = [];
     this.columnValueList = [];
     this.selectedColumnList = [];
     this.getAllDataSources();
-    // let item1 = {
-    //   'empid':'Employee Id',
-    // }
-    // let item2={
-    //   'first_name': 'First Name'
-    // }
-    // this.tableHtmlColumnMapper.push(item1);
-    // this.tableHtmlColumnMapper.push(item2);
-    
   }
 
   changeColumnHeader() {
     this.isHeaderChanged = true;
-    this.connectionService.updateColumnName(this.old_column_name, this.selectedColumnForHeader, this.table_name, this.model).subscribe((res : any) => {
-      console.log('column name ' +this.selectedColumnForHeader);
-      if(res == null) {
-         this.alertifyService.success('Successfully Header Changed');
+    let columnValueMap = new Map<String, String>();
+    for (let colT of this.columnList) {
+      let col = colT.column_name;
+      if (col === this.old_column_name) {
+        columnValueMap.set(col, this.selectedColumnForHeader);
+      } else {
+        if (this.tableHtmlColumnMapper && this.tableHtmlColumnMapper.length != 0 && this.tableHtmlColumnMapper[0].mapperdetails)
+          columnValueMap.set(col, JSON.parse(this.tableHtmlColumnMapper[0].mapperdetails)[col]);
       }
-      this.getTableDetails(this.table_name);
-      console.log('Selected column list: ' +this.selectedColumnList);
-   })
+    }
+    let columnMapper = new ColumnMapper(0, this.model, this.table_name, columnValueMap);
+    this.columnMapperService.createColumnMapper(columnMapper).subscribe((res: any) => {
+      this.getHtmlHeaders();
+    });
   }
 
   getHtmlHeaders() {
-    this.columnMapperService.getColumnMapperByConnectionAndTable(this.model.dataSourceName, this.table_name).subscribe((res : any) => {
+    this.columnMapperService.getColumnMapperByConnectionAndTable(this.model.dataSourceName + '', this.table_name).subscribe((res: any) => {
       this.tableHtmlColumnMapper = res;
-      console.log('Column Mapper: ' +res);
     })
   }
 
@@ -80,28 +77,26 @@ export class ConnectionComponent implements OnInit {
     this.connectionService.getConnectionByDataSourceName(event.target.value).subscribe((res: any) => {
       this.model = res;
     });
-    
   }
 
-  getTableDetails(tablename: string)  {
+  getTableDetails(tablename: string) {
     this.selectedColumnList = [];
     this.columnValueList = [];
     this.selectedColumnForHeader = '';
-    this.hasRequestTochangeHeader = false; 
+    this.hasRequestTochangeHeader = false;
     this.table_name = tablename;
-    this.connectionService.getTableInfo(tablename, this.model).subscribe((res : any) => {
+    this.connectionService.getTableInfo(tablename, this.model).subscribe((res: any) => {
       this.columnList = res;
+      this.getHtmlHeaders();
     })
-    this.saveColumnMapper();
   }
 
-  getColumnValue() : any {
+  getColumnValue(): any {
     let element = '';
     this.selectedColumnList.forEach(e => element = element + "," + e);
-    console.log('Selected column after load: ' +this.selectedColumnList)
-    this.connectionService.getColumnValue(element, this.table_name, this.model).subscribe((res : any) => {
-    this.columnValueList = res;
-    this.selectedColumnList = Object.getOwnPropertyNames(res[0]);
+    this.connectionService.getColumnValue(element, this.table_name, this.model).subscribe((res: any) => {
+      this.columnValueList = res;
+      this.selectedColumnList = Object.getOwnPropertyNames(res[0]);
     })
   }
 
@@ -109,10 +104,16 @@ export class ConnectionComponent implements OnInit {
     this.isRefreshedData = true;
   }
 
-  getColumnHeader(column:any){
-    for(let item of this.tableHtmlColumnMapper){
-      if(item[column]){
-        return item[column];
+  getColumnHeader(column: any) {
+    let headers = this.tableHtmlColumnMapper;
+    if (headers && headers.length != 0 && headers[0]['mapperdetails']) {
+      try {
+        let header = JSON.parse(headers[0]['mapperdetails'])[column];
+        if (header) {
+          return header;
+        }
+      } catch (error) {
+
       }
     }
     return column;
@@ -122,30 +123,21 @@ export class ConnectionComponent implements OnInit {
     this.model = new ConnectionModel('', '', '', '', '');
   }
 
-  selectColumn(event : any) {
+  selectColumn(event: any) {
     let columnName = event.currentTarget.value;
-    this.selectedColumnList.push(columnName);
-    console.log('Selected columns: ' +this.selectedColumnList);
+    if(columnName && event.currentTarget.checked) {
+      this.selectedColumnList.push(columnName);
+    } else if(!event.currentTarget.checked) {
+      this.selectedColumnList.pop();
+    }
+    var mySet = new Set(this.selectedColumnList);
+    this.selectedColumnList = [...mySet];
   }
 
-  selectColumnToChangeHeader(event : Event) {
+  selectColumnToChangeHeader(event: Event) {
     this.selectedColumnForHeader = (event.target as HTMLInputElement).value;
     this.old_column_name = this.selectedColumnForHeader;
     this.hasRequestTochangeHeader = true;
-  }
-
-  saveColumnMapper() {
-    if(this.columnList) {
-      let columnMap : Map<string, string>  = new Map<string, string> ();
-      console.log('Column List: ' +this.columnList);
-      for(let col of this.columnList) {
-        columnMap.set(col.column_name, col.column_name);
-      }
-      this.columnMapper = new ColumnMapper('', this.model.dataSourceName, this.table_name, columnMap);
-      this.columnMapperService.createColumnMapper(this.columnMapper).subscribe((res : any) => {
-        console.log('Column Mapper  saved: ' +res);
-      })
-    }
   }
 
   testConnection() {
@@ -154,7 +146,6 @@ export class ConnectionComponent implements OnInit {
       this.columnList = [];
     });
     this.getAllDataSources();
-   
   }
 
 }

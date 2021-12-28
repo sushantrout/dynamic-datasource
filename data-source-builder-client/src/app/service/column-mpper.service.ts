@@ -13,6 +13,11 @@ export class ColumnMpperService {
   constructor(private apiService : ApiService) { }
 
   createColumnMapper(columnmapper : ColumnMapper) : Observable<ColumnMapper>{
+    let obj:any = {};
+    columnmapper.mapperdetails.forEach((value:string , key:string) => {
+      obj[key] = value;
+    });
+    columnmapper.mapperdetails = JSON.stringify(obj);
     return this.apiService.post(this.baseURL, columnmapper);
   }
 
