@@ -72,7 +72,17 @@
           </td>
       </tr>
     </table> -->
-    <!-- <mat-table [dataSource]="columnValueList" matTableExporter class="mat-elevation-z8" #exporter="matTableExporter">
+    <div class="col-md-4">
+      <button mat-raised-button class="" (click)="exporter.exportTable('xlsx', fileData)">XLSX
+      </button>
+      <button mat-raised-button color="primary" class="ml2 pull-right"
+          (click)="exporter.exportTable('csv')">CSV </button>
+      <button mat-raised-button color="accent" class="ml2"
+          (click)="exporter.exportTable('txt')">txt</button>
+      <button mat-raised-button color="warn" class="ml2"
+          (click)="exporter.exportTable('json')">JSON</button>
+  </div>
+    <mat-table [dataSource]="columnValueList" matTableExporter class="mat-elevation-z8" #exporter="matTableExporter">
       <ng-template ngFor let-elementF [ngForOf]="selectedColumnList">
         <ng-container [matColumnDef]="elementF">
           <mat-header-cell *matHeaderCellDef> {{getColumnHeader(elementF)}} </mat-header-cell>
@@ -81,7 +91,7 @@
       </ng-template>
       <mat-header-row *matHeaderRowDef="selectedColumnList"></mat-header-row>
       <mat-row *matRowDef="let row; columns: selectedColumnList;"></mat-row>
-    </mat-table> -->
+    </mat-table>
     <button class="btn btn-primary" *ngIf="isHeaderChanged" (click)="getTableData()">Refresh table</button>
   </div>
 </div>

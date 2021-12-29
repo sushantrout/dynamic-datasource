@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Options } from 'mat-table-exporter';
 import { ColumnMapper } from '../model/columnmapper.model';
 import { ConnectionModel } from '../model/connection.model';
 import { AlertifyService } from '../service/alertify.service';
@@ -14,6 +15,10 @@ export class ConnectionComponent implements OnInit {
   
   constructor(private connectionService: ConnectionService, private columnMapperService: ColumnMpperService, private alertifyService: AlertifyService) { }
  
+  fileData : Options = {
+    
+  };
+
   model: ConnectionModel = new ConnectionModel('', '', '', '', '');
   columnMapper: ColumnMapper = new ColumnMapper('', new ConnectionModel(), '', '');
 
@@ -78,6 +83,7 @@ export class ConnectionComponent implements OnInit {
       this.model = res;
     });
   }
+  
 
   getTableDetails(tablename: string) {
     this.selectedColumnList = [];
@@ -85,6 +91,9 @@ export class ConnectionComponent implements OnInit {
     this.selectedColumnForHeader = '';
     this.hasRequestTochangeHeader = false;
     this.table_name = tablename;
+    this.fileData = {
+      fileName: tablename
+    }
     this.connectionService.getTableInfo(tablename, this.model).subscribe((res: any) => {
       this.columnList = res;
       this.getHtmlHeaders();
