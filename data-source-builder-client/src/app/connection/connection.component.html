@@ -2,9 +2,8 @@
   <div class="col-md-3">
     <select id="databases" class="selectbtn" (change)="getDataSourceTables($event)" style='width:100%;'>
       <option class="btn btn-info">--Please Select--</option>
-      <option *ngFor='let datasource of dataSources' class="btn btn-info"
-      style="margin: 10px;"
-      value="{{datasource.dataSourceName}}">{{datasource.dataSourceName}}</option>
+      <option *ngFor='let datasource of dataSources' class="btn btn-info" style="margin: 10px;"
+        value="{{datasource.dataSourceName}}">{{datasource.dataSourceName}}</option>
     </select>
   </div>
 </div>
@@ -13,83 +12,54 @@
   <div class="col-md-3" style="margin-top: 10px;">
     <div class="form-group">
       <label for="dataSourceName">Datasource Name</label>
-      <input
-        type="text"
-        class="form-control"
-        id="dataSourceName"
-        [(ngModel)]='model.dataSourceName'
-        placeholder="DATASOURCE NAME"
-      />
+      <input type="text" class="form-control" id="dataSourceName" [(ngModel)]='model.dataSourceName'
+        placeholder="DATASOURCE NAME" />
     </div>
-      <div class="form-group">
-        <label for="url">URL</label>
-        <input
-          type="text"
-          class="form-control"
-          id="url"
-          [(ngModel)]='model.url'
-          placeholder="URL"
-        />
-      </div>
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          class="form-control"
-          id="username"
-          placeholder="USERNAME"
-          [(ngModel)]='model.username'
-        />
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="text"
-          class="form-control"
-          id="password"
-          [(ngModel)]='model.password'
-          placeholder="PASSWORD"
-        />
-      </div>
-      <div class="form-group">
-        <label for="type">Type</label>
-        <input
-          type="text"
-          class="form-control"
-          id="type"
-          [(ngModel)]='model.type'
-          placeholder="TYPE"
-        />
-      </div>
-      <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;" (click)="testConnection()">Test Connection!</button>
-      <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
+    <div class="form-group">
+      <label for="url">URL</label>
+      <input type="text" class="form-control" id="url" [(ngModel)]='model.url' placeholder="URL" />
+    </div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control" id="username" placeholder="USERNAME" [(ngModel)]='model.username' />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="text" class="form-control" id="password" [(ngModel)]='model.password' placeholder="PASSWORD" />
+    </div>
+    <div class="form-group">
+      <label for="type">Type</label>
+      <input type="text" class="form-control" id="type" [(ngModel)]='model.type' placeholder="TYPE" />
+    </div>
+    <button type="submit" class="btn btn-primary" style="float: right; margin-left: 15px;"
+      (click)="testConnection()">Test Connection!</button>
+    <button type="reset" class="btn btn-primary" style="float: right;" (click)='reset()'>Reset</button>
   </div>
   <div class="col-md-3">
     <div class="card" style="margin-top: 80px;">
-      <button *ngFor='let table of tableList' class="btn btn-info"
-      style="margin: 10px;"
-      (click)="getTableDetails(table.table_name)" (change)="getTableDetails(table.table_name)">{{table.table_name}}</button>
+      <button *ngFor='let table of tableList' class="btn btn-info" style="margin: 10px;"
+        (click)="getTableDetails(table.table_name)"
+        (change)="getTableDetails(table.table_name)">{{table.table_name}}</button>
     </div>
   </div>
   <div class="col-md-3">
     <p *ngFor='let column of columnList'>
-      <input type="checkbox" [value]="column.column_name"
-            (change)="selectColumn($event)"> {{column.column_name}}
-      <input name="radio" type="radio" (click)="selectColumnToChangeHeader($event)" [value]="column.column_name"> Want to change the header name?
+      <input type="checkbox" [value]="column.column_name" (change)="selectColumn($event)"> {{column.column_name}}
+      <input name="radio" type="radio" (click)="selectColumnToChangeHeader($event)" [value]="column.column_name"> Want
+      to change the header name?
     </p>
-    
-    <input type="text" *ngIf="hasRequestTochangeHeader"
-            class="form-control"
-            id="url"
-            [(ngModel)]='selectedColumnForHeader'
-            placeholder="change column header"
-          />
-    <button class="btn btn-primary" *ngIf="table_name" (click)="getColumnValue()" style="margin-top: 10px; margin-bottom: 10px">Load Data</button> &nbsp;
-    <button class="btn btn-primary" *ngIf="hasRequestTochangeHeader" (click)="changeColumnHeader()">Change Header</button>
+
+    <input type="text" *ngIf="hasRequestTochangeHeader" class="form-control" id="url"
+      [(ngModel)]='selectedColumnForHeader' placeholder="change column header" />
+    <button class="btn btn-primary" *ngIf="table_name" (click)="getColumnValue()"
+      style="margin-top: 10px; margin-bottom: 10px">Load Data</button> &nbsp;
+    <button class="btn btn-primary" *ngIf="hasRequestTochangeHeader" (click)="changeColumnHeader()">Change
+      Header</button>
   </div>
   <div class="col-md-3" *ngIf="table_name" style="margin-top: 10px;">
-    <button class="btn btn-primary" *ngIf="table_name" style="margin-top: 10px; margin-bottom: 10px">{{table_name}}</button>
-    <table class="table table-sm table-hover table-dark table-bordered">
+    <button class="btn btn-primary" *ngIf="table_name"
+      style="margin-top: 10px; margin-bottom: 10px">{{table_name}}</button>
+    <!-- <table class="table table-sm table-hover table-dark table-bordered">
         <tr>
           <th *ngFor='let column of selectedColumnList'>
             {{getColumnHeader(column)}}
@@ -101,7 +71,17 @@
             {{columnvalue[propertyName]}}
           </td>
       </tr>
-    </table>
+    </table> -->
+    <!-- <mat-table [dataSource]="columnValueList" matTableExporter class="mat-elevation-z8" #exporter="matTableExporter">
+      <ng-template ngFor let-elementF [ngForOf]="selectedColumnList">
+        <ng-container [matColumnDef]="elementF">
+          <mat-header-cell *matHeaderCellDef> {{getColumnHeader(elementF)}} </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element[elementF]}} </mat-cell>
+        </ng-container>
+      </ng-template>
+      <mat-header-row *matHeaderRowDef="selectedColumnList"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: selectedColumnList;"></mat-row>
+    </mat-table> -->
     <button class="btn btn-primary" *ngIf="isHeaderChanged" (click)="getTableData()">Refresh table</button>
   </div>
 </div>
