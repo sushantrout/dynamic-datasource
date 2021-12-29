@@ -72,16 +72,16 @@
           </td>
       </tr>
     </table> -->
-    <div class="col-md-4">
-      <button mat-raised-button class="" (click)="exporter.exportTable('xlsx', fileData)">XLSX
+    <div >
+      <button mat-raised-button class="btn btn-primary export-btn" (click)="exporter.exportTable('xlsx', fileData)">XLSX
       </button>
-      <button mat-raised-button color="primary" class="ml2 pull-right"
-          (click)="exporter.exportTable('csv')">CSV </button>
-      <button mat-raised-button color="accent" class="ml2"
-          (click)="exporter.exportTable('txt')">txt</button>
-      <button mat-raised-button color="warn" class="ml2"
-          (click)="exporter.exportTable('json')">JSON</button>
-  </div>
+      <button mat-raised-button color="primary" class="ml2 pull-right btn-primary export-btn"
+        (click)="exporter.exportTable('csv', fileData)">CSV </button>
+      <button mat-raised-button color="accent" class="ml2 btn-primary export-btn"
+        (click)="exporter.exportTable('txt', fileData)">txt</button>
+      <button mat-raised-button color="warn" class="ml2 btn-warning export-btn"
+        (click)="exporter.exportTable('json', fileData)">JSON</button>
+    </div>
     <mat-table [dataSource]="columnValueList" matTableExporter class="mat-elevation-z8" #exporter="matTableExporter">
       <ng-template ngFor let-elementF [ngForOf]="selectedColumnList">
         <ng-container [matColumnDef]="elementF">
